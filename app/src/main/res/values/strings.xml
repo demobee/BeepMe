@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Beep Me</string>
+    <string name="title_section1">Recent Chats</string>
+    <string name="title_section2">Available Connections</string>
+    <string name="title_section3">Contacts</string>
+    <string name="title_wifi_header">Turn on WiFi connection?</string>
+    <string name="turn_on_wifi">Yes</string>
+    <string name="do_not_turn_on_wifi">No</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example"></string>
+    <string name="action_settings">Settings</string>
+</resources>
