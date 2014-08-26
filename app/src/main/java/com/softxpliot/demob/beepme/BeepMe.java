@@ -2,12 +2,9 @@ package com.softxpliot.demob.beepme;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -234,7 +231,7 @@ public class BeepMe extends Activity
                                 if(peer.deviceName.equals (((TextView) view).getText())){
                                     config.deviceAddress = peer.deviceAddress;
                                     config.wps.setup = WpsInfo.PBC;
-                                    connect(config);
+                                    connect(config,peer);
                                 }
                             }
                         }
@@ -303,7 +300,6 @@ public class BeepMe extends Activity
         super.onResume();
         mReceiver = new BeepMeBroadCastReceiver(mManager, mChannel,this);
         registerReceiver(mReceiver, filter);
-        //discoverPeers(mChannel);
     }
 
     /**
@@ -384,8 +380,29 @@ public class BeepMe extends Activity
         return deviceNames;
     }
 
-    public void connect(WifiP2pConfig config){
+    public void connect(final WifiP2pConfig config, final WifiP2pDevice device){
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Contact contact = new Contact(device, getApplicationContext());
+                if(!contact.isAdded(device.deviceAddress)){
+                    contact.insert(device);
+                }
+                else{
+                    Toast.makeText(BeepMe.this, "This device is already in your contact.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int reason) {
+
+            }
+        });
+    }
+
+
+    public void cancelConnection(WifiP2pManager.Channel channel){
+        mManager.cancelConnect(channel,new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
 
@@ -398,21 +415,17 @@ public class BeepMe extends Activity
         });
     }
 
-    public Dialog pairWithDevice(String message,final WifiP2pConfig config){
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        alertDialog.setMessage("Do you want to pair with " +message + " ?");
-        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+    public  void stopPeerDiscovery(WifiP2pManager.Channel channel){
+        mManager.stopPeerDiscovery(channel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                connect(config);
+            public void onSuccess() {
+
             }
-        }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onFailure(int reason) {
 
             }
         });
-
-        return alertDialog.create();
     }
 }
